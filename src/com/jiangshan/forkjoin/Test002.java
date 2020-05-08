@@ -3,16 +3,15 @@ package com.jiangshan.forkjoin;
 import java.util.concurrent.ForkJoinPool;
 
 public class Test002 {
-
+	
 	public static void main(String[] args) {
-		Integer[] array = ArrayUtils.makeArray(100000, 10000);
+		Integer[] array = ArrayUtils.makeArray(10000, 10000);
 		long begin = System.currentTimeMillis();
 		ForkJoinPool pool = new ForkJoinPool();
-		SumTask task = new SumTask(array);
-		pool.invoke(task);
+		SumTask sumTask = new SumTask(array, 0, array.length-1);
+		pool.invoke(sumTask);
 		long end = System.currentTimeMillis();
-		System.out.println("[sum:"+task.join()+"]");
-		System.out.println("[time:"+(end-begin)+"]");
+		System.out.println("[sum:"+sumTask.join()+",time:"+(end-begin)+"]");
 	}
 	
 }

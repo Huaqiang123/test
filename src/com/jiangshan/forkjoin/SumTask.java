@@ -1,39 +1,44 @@
 package com.jiangshan.forkjoin;
 
-import java.util.Arrays;
 import java.util.concurrent.RecursiveTask;
 
 public class SumTask extends RecursiveTask<Integer> {
-	
-	private static final Integer THRESHOLD = 1000;
 
+	private static final long serialVersionUID = 3426964350248012497L;
+
+	private static final Integer THRESHOLD = 1000;
+	
 	private Integer[] array;
 	
-	public SumTask(Integer[] array) {
-		
-		this.array = array;
-	}
+	private Integer fromIndex;
 	
+	private Integer toIndex;
+	
+	public SumTask(Integer[] array, Integer fromIndex, Integer toIndex) {
+		this.array = array;
+		this.fromIndex = fromIndex;
+		this.toIndex = toIndex;
+	}
+
 	@Override
 	protected Integer compute() {
 		
-		if(array==null)
+		if(array==null) {
 			return 0;
-		if(array.length<=THRESHOLD) {
+		}
+		if((toIndex-fromIndex+1)<=THRESHOLD) {
 			Integer sum = 0;
-			for(int i=0; i<array.length; i++) {
+			for(int i=fromIndex; i<=toIndex; i++) {
 				sum += array[i];
 			}
 			return sum;
+		} else {
+			Integer mid = (fromIndex+toIndex)/2;
+			SumTask leftTask = new SumTask(array, fromIndex, mid);
+			SumTask rightTask = new SumTask(array, mid+1, toIndex);
+			invokeAll(leftTask, rightTask);
+			return leftTask.join() + rightTask.join();
 		}
-		int length = array.length;
-		int mid = length/2;
-		Integer[] array1 = Arrays.copyOfRange(array, 0, mid);
-		Integer[] array2 = Arrays.copyOfRange(array, mid, length);	
-		SumTask task1 = new SumTask(array1);
-		SumTask task2 = new SumTask(array2);
-		invokeAll(task1, task2);
-		return task1.join() + task2.join();
 	}
-
+	
 }
